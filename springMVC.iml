@@ -12,12 +12,18 @@
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration />
+      <configuration>
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/web/WEB-INF/applicationContext.xml</file>
+          <file>file://$MODULE_DIR$/web/WEB-INF/dispatcher-servlet.xml</file>
+          <file>file://$MODULE_DIR$/src/ConfigClass.java</file>
+        </fileset>
+      </configuration>
     </facet>
     <facet type="web" name="Web2">
       <configuration>
         <descriptors>
-          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/web/resources/web.xml" />
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/web/resources/actors.xml" />
         </descriptors>
         <webroots>
           <root url="file://$MODULE_DIR$/web/resources" relative="/WEB-INF" />

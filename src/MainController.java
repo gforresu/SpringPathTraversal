@@ -1,4 +1,5 @@
 
+import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.core.io.Resource;
@@ -8,13 +9,19 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Created by giacomo on 21/10/16.
  */
+
+
 @org.springframework.stereotype.Controller
 public class MainController implements Controller {
+
+    String resourceName = "actors.xml";
 
     @Override
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response)
@@ -26,18 +33,39 @@ public class MainController implements Controller {
 
         ResourceProvider resourceProvider = new ResourceProvider(request);
 
+        /*
+        ModelMap view = new ModelMap();
 
-        Resource r= resourceProvider.getStuff(request,response);
+        view.addAttribute("prova", "vediamo se appare");
+        view.addAttribute("prova", "vediamo se appare1");
+*/
 
-        if (r != null)
+        List<String> actorsAndFilms = resourceProvider.getStuff(request,response);
+
+        if (! actorsAndFilms.isEmpty())
         {
-            System.out.println(r.getURL().getPath());
-            // TODO: CREATE A VIEW  ---> return new ModelAndView(r.getURL().getPath());
-            return new ModelAndView("hacked.jsp");
+            //if(r.getFilename().equals(resourceName))
+            {
+                ModelAndView modelAndView = new ModelAndView("hello.jsp");
+                modelAndView.addObject("actorsAndFilms", actorsAndFilms);
+                return modelAndView;
+            }
+
+
+           /* else
+            {
+                   System.out.println(r.getURL().getPath());
+                // TODO: CREATE A VIEW  ---> return new ModelAndView(r.getURL().getPath());
+                     return new ModelAndView("hacked.jsp", view);
+            }
+
+            */
         }
 
         else
             return new ModelAndView("hello.jsp");
+
+
     }
 
     /*

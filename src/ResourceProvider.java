@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 import org.w3c.dom.*;
 
@@ -25,12 +26,12 @@ import java.util.List;
 
 public class ResourceProvider extends ResourceHttpRequestHandler{
 
-    //@RequestMapping(method = RequestMethod.GET, value = "/")
-    //@ResponseBody
+    String resourceName = "actors.xml";
+
     public ResourceProvider(HttpServletRequest request )
     {
-        String path = request.getSession().getServletContext().getRealPath("/resources/")+"web.xml";
-        //System.out.println("Path web.xml "+ path);
+        String path = request.getSession().getServletContext().getRealPath("/resources/")+resourceName;
+        //System.out.println("Path actors.xml "+ path);
 
 
         Resource r = new FileSystemResource(new File(path));
@@ -57,7 +58,7 @@ public class ResourceProvider extends ResourceHttpRequestHandler{
         */
     }
 
-    public Resource getStuff(HttpServletRequest request, HttpServletResponse response )//, @RequestParam("file") String fileName)
+    public List<String> getStuff(HttpServletRequest request, HttpServletResponse response )//, @RequestParam("file") String fileName)
     {
         Resource res = null;
         /*
@@ -79,15 +80,21 @@ public class ResourceProvider extends ResourceHttpRequestHandler{
         System.out.println(" (! hasText) "+ ! org.springframework.util.StringUtils.hasText(path));
 
         //!! Vulnerable string http://localhost:8080/index.htm?file=/../../../conf/tomcat-users.xml
-       
+        List<String> actorsAndFilms = new ArrayList<String>();
+
         System.out.println(this.getLocations().toString());
         try {
 
             res = getResource(request);
 
 
+
+
             if(res != null){
-                System.out.println("HACKED!");
+
+                if( ! res.getFilename().equals(resourceName))
+                    System.out.println("*****HACKED!******");
+
                 System.out.println("Is readable? "+ res.isReadable());
                 File f = res.getFile();
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -98,18 +105,23 @@ public class ResourceProvider extends ResourceHttpRequestHandler{
                     doc.getDocumentElement().normalize();
                     Element parent = doc.getDocumentElement();
                     System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+                    actorsAndFilms.add(doc.getDocumentElement().getNodeName());
                     NodeList childNodes = parent.getChildNodes();
 
                     for(int i=0; i< childNodes.getLength(); i++)
                     {
                         System.out.println(childNodes.item(i).getNodeName()) ;
-
+                        actorsAndFilms.add(childNodes.item(i).getNodeName());
 
                         NamedNodeMap n = childNodes.item(i).getAttributes();
                         if(n != null)
                         {
                             for (int j=0; j< n.getLength(); j++ )
+                            {
+                                actorsAndFilms.add(n.item(j).toString()); //.replace("name=", "").replace("\"", ""));
                                 System.out.println(n.item(j).toString());
+                            }
+
                         }
 
 
@@ -123,10 +135,11 @@ public class ResourceProvider extends ResourceHttpRequestHandler{
                 System.out.println(res.getFilename());}
             }
 
-        catch (IOException r) { return res;}
+        catch (IOException r) { return actorsAndFilms;}
 
+        System.out.println("LIST DIMENSION "+ actorsAndFilms.size());
 
-        return res;
+        return actorsAndFilms;
 
     }
 
